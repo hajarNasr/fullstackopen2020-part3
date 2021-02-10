@@ -56,11 +56,30 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
+const isUnique = (name) => {
+  const person = persons.find(
+    (p) => p.name.toLowerCase() === name.toLowerCase()
+  );
+  return person ? true : false;
+};
+
 app.post("/api/persons/", (request, response) => {
   const newPreson = request.body;
   newPreson = { id: Math.floor(Math.random() * 1000), ...newPreson };
 
-  response.json(newPreson);
+  if (!newPreson.name || !newPreson.number) {
+    return response.status(400).json({
+      error: "Missing name or number",
+    });
+  }
+  if (!isUnique(newPreson.name)) {
+    return response.status(400).json({
+      error: "Name must be unique",
+    });
+  } else {
+    persons = { ...persons, newPreson };
+    response.json(newPreson);
+  }
 });
 
 app.listen(3001, () => {
