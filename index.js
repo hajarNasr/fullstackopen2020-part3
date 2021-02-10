@@ -47,6 +47,14 @@ app.get("/api/persons/:id", (request, response) => {
     response.status(404).end();
   }
 });
+
+app.delete("/api/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+  persons = persons.filter((p) => p.id !== id);
+
+  response.status(204).end();
+});
+
 app.listen(3001, () => {
   console.log("Server running on port 3001");
 });
