@@ -4,8 +4,15 @@ const morgan = require("morgan");
 
 const app = express();
 app.use(express.json());
-app.use(morgan("tiny"));
 
+morgan.token("bodyContent", (request, response) => request.body);
+morgan.token("path", (request, response) => request.path);
+
+app.use(
+  morgan(
+    ":method :path :status - :response-time ms :res[content-length] :bodyContent"
+  )
+);
 let persons = [
   {
     id: 1,
@@ -34,6 +41,7 @@ app.get("/api/persons", (request, response) => {
 });
 
 app.get("/info", (request, response) => {
+  console.log(request.path);
   response.send(
     `<p>Phonebook has info for ${
       persons.length
