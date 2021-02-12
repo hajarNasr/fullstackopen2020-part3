@@ -1,0 +1,2 @@
+.error,.success{position:absolute;top:0;box-shadow:1px 1px 1px rgba(0,0,0,.3);width:50%;left:0;right:0;margin-left:auto;margin-right:auto;border:2px solid transparent;opacity:1;animation:disappear 2s 0s 1 both;height:50px}.error{border-color:red;color:red}.success{border-color:green;color:green}@keyframes disappear{0%{opacity:1}90%{opacity:.8}to{opacity:0}}
+/*# sourceMappingURL=main.8e68e1c3.chunk.css.map */

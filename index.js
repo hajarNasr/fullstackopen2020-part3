@@ -38,6 +38,8 @@ let persons = [
   },
 ];
 
+app.use(express.static("build"));
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
@@ -77,7 +79,7 @@ const isUnique = (name) => {
 };
 
 app.post("/api/persons/", (request, response) => {
-  const newPreson = request.body;
+  let newPreson = request.body;
   newPreson = { id: Math.floor(Math.random() * 1000), ...newPreson };
 
   if (!newPreson.name || !newPreson.number) {
@@ -94,6 +96,7 @@ app.post("/api/persons/", (request, response) => {
     response.json(newPreson);
   }
 });
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
