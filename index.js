@@ -75,7 +75,7 @@ const isUnique = (name) => {
   const person = persons.find(
     (p) => p.name.toLowerCase() === name.toLowerCase()
   );
-  return person ? true : false;
+  return person ? false : true;
 };
 
 app.post("/api/persons/", (request, response) => {
@@ -92,7 +92,7 @@ app.post("/api/persons/", (request, response) => {
       error: "Name must be unique",
     });
   } else {
-    persons = { ...persons, newPreson };
+    persons = [...persons, newPreson];
     response.json(newPreson);
   }
 });
