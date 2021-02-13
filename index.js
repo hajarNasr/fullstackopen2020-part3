@@ -54,34 +54,30 @@ app.get("/info", (request, response) => {
 app.get("/api/persons/:id", (request, response) => {
   Person.findById(request.params.id)
     .then((person) => {
-      response.json(person);
+      person ? response.json(person) : response.status(404).end();
     })
-    .catch((err) => {
-      response.status(404).end();
-    });
+    .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response) => {
-  Person.findByIdAndUpdate(request.params.id, { number: request.body.number })
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { number: request.body.number },
+    { new: true }
+  )
     .then((person) => {
       response.json(person);
     })
-    .catch((err) => {
-      response.status(404).end();
-    });
+    .catch((error) => next(error));
 });
 
 app.delete("/api/persons/:id", (request, response) => {
   Person.findByIdAndRemove(request.params.id)
     .exec()
     .then((res) => {
-      Person.find({}).then((persons) => {
-        response.json(persons);
-      });
-    })
-    .catch((err) => {
       response.status(204).end();
-    });
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons/", (request, response) => {
@@ -104,15 +100,29 @@ app.post("/api/persons/", (request, response) => {
           .then((person) => {
             response.json(person);
           })
-          .catch((err) => {
-            console.log(err);
-          });
+          .catch((error) => next(error));
       }
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((error) => next(error));
 });
+
+const error404 = (request, response) => {
+  response.status(404).send({ error: "404 page not found" });
+};
+
+app.use(error404);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError" && error.kind == "ObjectId") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
