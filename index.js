@@ -20,7 +20,7 @@ app.use(
 );
 
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -51,7 +51,7 @@ app.get("/info", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id)
     .then((person) => {
       person ? response.json(person) : response.status(404).end();
@@ -59,11 +59,11 @@ app.get("/api/persons/:id", (request, response) => {
     .catch((error) => next(error));
 });
 
-app.put("/api/persons/:id", (request, response) => {
+app.put("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndUpdate(
     request.params.id,
     { number: request.body.number },
-    { new: true }
+    { runValidators: true }
   )
     .then((person) => {
       response.json(person);
@@ -80,7 +80,7 @@ app.delete("/api/persons/:id", (request, response) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons/", (request, response) => {
+app.post("/api/persons/", (request, response, next) => {
   let newPreson = new Person(request.body);
 
   if (!newPreson.name || !newPreson.number) {
@@ -113,10 +113,11 @@ const error404 = (request, response) => {
 app.use(error404);
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message);
-
+  console.log(error);
   if (error.name === "CastError" && error.kind == "ObjectId") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
